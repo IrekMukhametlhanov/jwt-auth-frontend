@@ -1,26 +1,33 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate} from 'react-router-dom';
+import Main from './pages/main/Main';
+import Dashboard from './pages/dashboard';
+import Header from './components/Header';
+import { useSelector } from 'react-redux';
+import { IRootState, useAppDispatch } from './store';
+import { stat } from 'fs';
+import { getProfile } from './store/auth/actionCreators';
+
+
+
+
 
 function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+
+  const dispatch = useAppDispatch();
+
+  useEffect(() => {
+   dispatch(getProfile())
+  },[dispatch])
+  const isLoggedIn = useSelector((state: IRootState) => !!state.auth.authData.accessToken)
+  return <Router>
+    <Header/>
+    <Routes>
+      <Route path='/' element={<Main/>}/>
+      <Route path='/dashboard' element={isLoggedIn ? <Dashboard/> : <Navigate to="/"/>}/>
+    </Routes>
+    </Router>
+  
 }
 
 export default App;
